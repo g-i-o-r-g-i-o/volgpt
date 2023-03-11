@@ -4,8 +4,7 @@
 *.pkl
 data/
 allfiles/
-input.txt
-data.csv
+df_data.txt
 
 # jupyter checkpoints
 .ipynb_checkpoints/
