@@ -4,9 +4,8 @@ import pandas as pd
 import numpy as np
 from scipy import stats
 
-# import HF data (AAPL, JPM), being 563 daily files
 def high_frequency_data():
-    path = 'allfiles'
+    path = 'allfiles' # import HF data (AAPL, JPM), being 563 daily files
     all_files = glob.glob(os.path.join(path,"**/*.csv.gz"))
     np_array_list = []
     for file_ in all_files:
