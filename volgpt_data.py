@@ -18,10 +18,6 @@ def high_frequency_data():
     # Set column headings
     df_data.columns = ["Date","Ticker","TimeBarStart","OpenBarTime","OpenBidPrice","OpenBidSize", "OpenAskPrice","OpenAskSize","FirstTradeTime","FirstTradePrice","FirstTradeSize","HighBidTime","HighBidPrice","HighBidSize","HighAskTime","HighAskPrice","HighAskSize","HighTradeTime","HighTradePrice","HighTradeSize","LowBidTime","LowBidPrice","LowBidSize","LowAskTime","LowAskPrice","LowAskSize","LowTradeTime","LowTradePrice","LowTradeSize","CloseBarTime","CloseBidPrice","CloseBidSize","CloseAskPrice","CloseAskSize","LastTradeTime","LastTradePrice","LastTradeSize","MinSpread","MaxSpread","CancelSize","VolumeWeightPrice","NBBOQuoteCount","TradeAtBid","TradeAtBidMid","TradeAtMid","TradeAtMidAsk","TradeAtAsk","TradeAtCrossOrLocked","Volume","TotalTrades","FinraVolume","FinraVolumeWeightPrice","UptickVolume","DowntickVolume","RepeatUptickVolume","RepeatDowntickVolume","UnknownTickVolume","TradeToMidVolWeight","TradeToMidVolWeightRelative","TimeWeightBid","TimeWeightAsk"]
 
-    # Calculate the proportion of missing values and zero values for each column
-    prop_missing = (df_data.isna().sum() + (df_data == 0).sum()) / len(df_data)
-    prop_missing_pct = prop_missing.map('{:.4%}'.format)  # Format as a percentage to 4dp
-
     # Set datatypes for columns used to compute weighted mid-price
     df_data['CloseBidSize'] = df_data['CloseBidSize'].astype(float)
     df_data['CloseAskSize'] = df_data['CloseAskSize'].astype(float)
@@ -58,6 +54,17 @@ def high_frequency_data():
     # Append log returns as additional columns to df_data
     df_data = pd.concat([df_data, AAPL_lr.rename('AAPL_lr'), JPM_lr.rename('JPM_lr')], axis=1)
 
+    # Round all numeric columns to 2 decimal place, this helps with the model's performance
+    df_data['CloseBidSize'] = df_data['CloseBidSize'].round(2)
+    df_data['CloseAskSize'] = df_data['CloseAskSize'].round(2)
+    df_data['CloseBidPrice'] = df_data['CloseBidPrice'].round(2)
+    df_data['CloseAskPrice'] = df_data['CloseAskPrice'].round(2)
+    df_data['WeightedMidPrice'] = df_data['WeightedMidPrice'].round(2)
+    df_data['AAPL_rr'] = df_data['AAPL_rr'].round(2)
+    df_data['JPM_rr'] = df_data['JPM_rr'].round(2)
+    df_data['AAPL_lr'] = df_data['AAPL_lr'].round(2)
+    df_data['JPM_lr'] = df_data['JPM_lr'].round(2)
+
     df_data.fillna("UNK", inplace=True) # Replace missing values with "UNK"
 
     df_data = df_data.astype(str) # Convert all columns to string
@@ -69,8 +76,12 @@ def high_frequency_data():
     JPM_rr_stat = JPM_rr_stat[JPM_rr_stat != 0].copy()
     AAPL_stats = stats.describe(AAPL_rr_stat) # Descriptive statistics for AAPL
     JPM_stats = stats.describe(JPM_rr_stat) # Descriptive statistics for JPM
+
+    # Split df_data into AAPL and JPM subsets
+    df_data_AAPL = df_data.loc[df_data['Ticker'] == 'AAPL']
+    df_data_JPM = df_data.loc[df_data['Ticker'] == 'JPM']
     
-    return (df_data, prop_missing_pct, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr, AAPL_stats, JPM_stats)
+    return (df_data, df_data_AAPL, df_data_JPM, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr, AAPL_stats, JPM_stats)
 
 
 

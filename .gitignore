@@ -5,6 +5,8 @@
 data/
 allfiles/
 df_data.txt
+df_data_AAPL.txt
+df_data_JPM.txt
 
 # jupyter checkpoints
 .ipynb_checkpoints/
