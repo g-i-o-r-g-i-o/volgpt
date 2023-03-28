@@ -3,10 +3,7 @@ import torch.nn as nn
 from torch.nn import functional as F
 
 # Define the function train_and_generate
-def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, device='cuda'):
-    # Move the code inside the function
-    # Update the file path and other necessary parameters
-    # ...
+def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, device='cuda', max_new_tokens=5000):
 
     # hyperparameters
     batch_size = 16 # how many independent sequences will we process in parallel?
@@ -215,11 +212,6 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
 
     # generate from the model
     context = torch.zeros((1, 1), dtype=torch.long, device=device)
-    print(decode(m.generate(context, max_new_tokens=2000)[0].tolist()))
+    # print(decode(m.generate(context, max_new_tokens=2000)[0].tolist()))
+    return decode(m.generate(context, max_new_tokens)[0].tolist())
 
-    # Place the rest of the code inside the function
-    # ...
-
-    if __name__ == "__main__":
-        # Call the function with the desired parameters
-        train_and_generate('df_data_AAPL.txt', max_iters=5000, learning_rate=1e-3)

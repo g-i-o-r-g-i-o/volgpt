@@ -1,3 +1,5 @@
+
+
 import pandas as pd
 import numpy as np
 import statsmodels.api as sm
@@ -6,7 +8,7 @@ from datetime import datetime
 
 def perform_mz_regression(data, column_names=None):
     if column_names is None:
-        column_names = ['Ticker', 'CloseBidSize', 'CloseAskSize', 'CloseBidPrice', 'CloseAskPrice', 'DateTime', 'WeightedMidPrice', 'rr', 'lr']
+        column_names = ['Ticker', 'CloseBidSize', 'CloseAskSize', 'CloseBidPrice', 'CloseAskPrice', 'WeightedMidPrice', 'rr', 'lr']
 
     def check_date_format(date_str):
         if pd.isna(date_str):
@@ -48,4 +50,4 @@ def perform_mz_regression(data, column_names=None):
     rr_results = mz_regression(df_clean['rr'], df_clean['WeightedMidPrice'])
     lr_results = mz_regression(df_clean['lr'], df_clean['WeightedMidPrice'])
 
-    return df, df_clean, rr_results, lr_results
+    return df, df_clean, rr_results, lr_results, invalid_rows
