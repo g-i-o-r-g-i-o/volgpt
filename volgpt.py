@@ -34,27 +34,62 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     encode = lambda s: [stoi[c] for c in s] # encoder: take a string, output a list of integers
     decode = lambda l: ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
 
-    # Train and test splits
+    # Train, validation, and test splits
+    # data = torch.tensor(encode(text), dtype=torch.long)
+    # n = int(0.9*len(data)) # first 90% will be train, rest val  
+    # train_data = data[:n]
+    # val_data = data[n:]
+
     data = torch.tensor(encode(text), dtype=torch.long)
-    n = int(0.9*len(data)) # first 90% will be train, rest val  
-    train_data = data[:n]
-    val_data = data[n:]
+    n_train = int(0.8 * len(data))  # first 80% will be train
+    n_val = int(0.1 * len(data))  # next 10% will be validation
+    train_data = data[:n_train] # final 10% will be test
+    val_data = data[n_train:n_train + n_val]
+    test_data = data[n_train + n_val:]
 
     # data loading
+    # def get_batch(split):
+    #     # generate a small batch of data of inputs x and targets y
+    #     data = train_data if split == 'train' else val_data
+    #     ix = torch.randint(len(data) - block_size, (batch_size,))
+    #     x = torch.stack([data[i:i+block_size] for i in ix])
+    #     y = torch.stack([data[i+1:i+block_size+1] for i in ix])
+    #     x, y = x.to(device), y.to(device)
+    #     return x, y
+
     def get_batch(split):
         # generate a small batch of data of inputs x and targets y
-        data = train_data if split == 'train' else val_data
+        if split == 'train':
+            data = train_data
+        elif split == 'val':
+            data = val_data
+        else:
+            data = test_data
         ix = torch.randint(len(data) - block_size, (batch_size,))
-        x = torch.stack([data[i:i+block_size] for i in ix])
-        y = torch.stack([data[i+1:i+block_size+1] for i in ix])
+        x = torch.stack([data[i:i + block_size] for i in ix])
+        y = torch.stack([data[i + 1:i + block_size + 1] for i in ix])
         x, y = x.to(device), y.to(device)
         return x, y
+
+    # @torch.no_grad()
+    # def estimate_loss():
+    #     out = {}
+    #     model.eval()
+    #     for split in ['train', 'val']:
+    #         losses = torch.zeros(eval_iters)
+    #         for k in range(eval_iters):
+    #             X, Y = get_batch(split)
+    #             logits, loss = model(X, Y)
+    #             losses[k] = loss.item()
+    #         out[split] = losses.mean()
+    #     model.train()
+    #     return out
 
     @torch.no_grad()
     def estimate_loss():
         out = {}
         model.eval()
-        for split in ['train', 'val']:
+        for split in ['train', 'val', 'test']:
             losses = torch.zeros(eval_iters)
             for k in range(eval_iters):
                 X, Y = get_batch(split)
@@ -196,10 +231,14 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
 
     for iter in range(max_iters):
 
-        # every once in a while evaluate the loss on train and val sets
+        # periodically evaluate loss on train, val, and test sets
+        # if iter % eval_interval == 0 or iter == max_iters - 1:
+        #     losses = estimate_loss()
+        #     print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+
         if iter % eval_interval == 0 or iter == max_iters - 1:
             losses = estimate_loss()
-            print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+            print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}, test loss {losses['test']:.4f}")
 
         # sample a batch of data
         xb, yb = get_batch('train')

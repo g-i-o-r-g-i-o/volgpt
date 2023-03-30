@@ -24,15 +24,17 @@ def high_frequency_data(dp=2):
     df_data['CloseBidPrice'] = df_data['CloseBidPrice'].astype(float)
     df_data['CloseAskPrice'] = df_data['CloseAskPrice'].astype(float)
 
+    # Create DateTimeIndex column, which is a combination of the Date and OpenBarTime columns, and set as index
+    df_data['DateTimeIndex'] = pd.to_datetime(df_data['Date'].astype(str)) + pd.to_timedelta(df_data['OpenBarTime'].astype(str))
+
     # Reduce number of columns for tractability 
     # NB: it may be helpful to use the other columns in the future to explore whether more data can be used to improve the model
-    df_data_full = df_data.copy()
-    df_data = df_data_full[['Ticker','CloseBidSize','CloseAskSize','CloseBidPrice','CloseAskPrice']].copy()   
+    df_data_full = df_data.copy()  
+    df_data = df_data_full[['DateTimeIndex','Ticker','CloseBidSize', 'CloseAskSize', 'CloseBidPrice', 'CloseAskPrice']].copy()
 
-    # Create DateTimeIndex column, which is a combination of the Date and OpenBarTime columns, and set as index
-    df_data['DateTimeIndex'] = pd.to_datetime(df_data_full['Date'].astype(str)) + pd.to_timedelta(df_data_full['OpenBarTime'].astype(str))
+    # Set DateTimeIndex as index
     df_data = df_data.set_index('DateTimeIndex')
-    
+        
     # Compute WeightedMidPrice using the closing prices per analysis in my high-frequency-data post
     df_data['WeightedMidPrice'] = ((df_data['CloseBidSize']*df_data['CloseAskPrice']) + (df_data['CloseAskSize']*df_data['CloseBidPrice'])) / (df_data['CloseBidSize'] + df_data['CloseAskSize'])
 
