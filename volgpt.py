@@ -28,17 +28,12 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     # here are all the unique characters that occur in this text
     chars = sorted(list(set(text)))
     vocab_size = len(chars)
+
     # create a mapping from characters to integers
     stoi = { ch:i for i,ch in enumerate(chars) }
     itos = { i:ch for i,ch in enumerate(chars) }
     encode = lambda s: [stoi[c] for c in s] # encoder: take a string, output a list of integers
     decode = lambda l: ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
-
-    # Train, validation, and test splits
-    # data = torch.tensor(encode(text), dtype=torch.long)
-    # n = int(0.9*len(data)) # first 90% will be train, rest val  
-    # train_data = data[:n]
-    # val_data = data[n:]
 
     data = torch.tensor(encode(text), dtype=torch.long)
     n_train = int(0.8 * len(data))  # first 80% will be train
@@ -46,16 +41,6 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     train_data = data[:n_train] # final 10% will be test
     val_data = data[n_train:n_train + n_val]
     test_data = data[n_train + n_val:]
-
-    # data loading
-    # def get_batch(split):
-    #     # generate a small batch of data of inputs x and targets y
-    #     data = train_data if split == 'train' else val_data
-    #     ix = torch.randint(len(data) - block_size, (batch_size,))
-    #     x = torch.stack([data[i:i+block_size] for i in ix])
-    #     y = torch.stack([data[i+1:i+block_size+1] for i in ix])
-    #     x, y = x.to(device), y.to(device)
-    #     return x, y
 
     def get_batch(split):
         # generate a small batch of data of inputs x and targets y
@@ -70,20 +55,6 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
         y = torch.stack([data[i + 1:i + block_size + 1] for i in ix])
         x, y = x.to(device), y.to(device)
         return x, y
-
-    # @torch.no_grad()
-    # def estimate_loss():
-    #     out = {}
-    #     model.eval()
-    #     for split in ['train', 'val']:
-    #         losses = torch.zeros(eval_iters)
-    #         for k in range(eval_iters):
-    #             X, Y = get_batch(split)
-    #             logits, loss = model(X, Y)
-    #             losses[k] = loss.item()
-    #         out[split] = losses.mean()
-    #     model.train()
-    #     return out
 
     @torch.no_grad()
     def estimate_loss():
@@ -171,7 +142,7 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
             x = x + self.ffwd(self.ln2(x))
             return x
 
-    # super simple bigram model
+    # Bigram model
     class BigramLanguageModel(nn.Module):
 
         def __init__(self):
@@ -229,6 +200,10 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     # create a PyTorch optimizer
     optimizer = torch.optim.AdamW(model.parameters(), lr=learning_rate)
 
+    # generate from the model
+    context = torch.zeros((1, 1), dtype=torch.long, device=device)
+
+    # training loop
     for iter in range(max_iters):
 
         # periodically evaluate loss on train, val, and test sets
@@ -249,8 +224,14 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
         loss.backward()
         optimizer.step()
 
-    # generate from the model
-    context = torch.zeros((1, 1), dtype=torch.long, device=device)
-    # print(decode(m.generate(context, max_new_tokens=2000)[0].tolist()))
-    return decode(m.generate(context, max_new_tokens)[0].tolist())
+        # ensure that the function returns the tuple containing the test_data tensor and the generated text when the training loop finishes
+        if iter == max_iters - 1:
+            return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
+
+    # return test_data, decode(m.generate(context, max_new_tokens)[0].tolist())
+    # Replace the existing return statement with this
+    return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
+
+
+
 

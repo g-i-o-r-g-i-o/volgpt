@@ -1,15 +1,16 @@
 import re
 import pandas as pd
 import statsmodels.api as sm
+from volgpt import train_and_generate, decode
 
-def mz_regressions(text):
+def mz_regressions(text_file_path, test_data):
 
     def extract_sequences(text):
         rr_seq = [len(x) for x in re.findall(r'rr+', text)]
         lr_seq = [len(x) for x in re.findall(r'll+', text)]
         return rr_seq, lr_seq
 
-    generated_text = train_and_generate(text_file_path, max_new_tokens=5000)
+    test_data, generated_text = train_and_generate(text_file_path, max_new_tokens=5000)
     test_text = decode(test_data.tolist())
 
     gen_rr_seq, gen_lr_seq = extract_sequences(generated_text)
