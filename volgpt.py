@@ -224,12 +224,12 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
         loss.backward()
         optimizer.step()
 
-        # ensure that the function returns the tuple containing the test_data tensor and the generated text when the training loop finishes
+        # Ensure function returns tuple containing  test_data tensor and the generated text when training loop finishes, along with itos mapping
         if iter == max_iters - 1:
             return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
 
     # return test_data, decode(m.generate(context, max_new_tokens)[0].tolist())
-    # Replace the existing return statement with this
+    # Ensure function returns tuple containing  test_data tensor and the generated text when training loop finishes, along with itos mapping
     return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
 
 
