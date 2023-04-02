@@ -1,6 +1,7 @@
 # statistical analysis of volgpt performance
 from scipy import stats
 from sklearn.metrics import mean_squared_error, mean_absolute_error
+from volgpt_clean_data import clean_data
 
 def volgpt_stats(generated_text, test_data, itos):
 
@@ -20,6 +21,10 @@ def volgpt_stats(generated_text, test_data, itos):
     # ensure the timing of the predictions and the test data are aligned by merging on DateTimeIndex
     merged_data = generated_clean.merge(test_data_clean, on='DateTimeIndex', suffixes=('_generated', '_test'))
 
+    # remove rows with spurious values for rr_generated and/or lr_generated 
+    merged_data = merged_data[(merged_data['rr_generated'] <= 2) & (merged_data['rr_generated'] >= -2) & 
+                                (merged_data['lr_generated'] <= 1) & (merged_data['lr_generated'] >= -1)]
+    
     # calculate MSE and MAE for the raw returns (rr) and log returns (lr)
     rr_mse = mean_squared_error(merged_data['rr_generated'], merged_data['rr_test'])
     rr_mae = mean_absolute_error(merged_data['rr_generated'], merged_data['rr_test'])

@@ -13,11 +13,26 @@ def clean_data(text_data, column_names=None):
     data_io = StringIO(text_data)
     df = pd.read_csv(data_io, header=None, names=column_names)
 
+    # check date format
+    # def check_date_format(date_str):
+    #     if pd.isna(date_str):
+    #         return False
+    #     try:
+    #         datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    #         return True
+    #     except ValueError:
+    #         return False
+
+    # check date format and check date range, removing rows with invalid date format or date range
     def check_date_format(date_str):
         if pd.isna(date_str):
             return False
         try:
-            datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+            dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+            min_date = datetime(2000, 1, 1)  # for tractability, I set ranges outside of the actual data range
+            max_date = datetime(2050, 12, 31)
+            if dt < min_date or dt > max_date:
+                return False
             return True
         except ValueError:
             return False

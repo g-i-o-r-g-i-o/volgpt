@@ -207,13 +207,13 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     for iter in range(max_iters):
 
         # periodically evaluate loss on train, val, and test sets
-        # if iter % eval_interval == 0 or iter == max_iters - 1:
-        #     losses = estimate_loss()
-        #     print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
-
         if iter % eval_interval == 0 or iter == max_iters - 1:
             losses = estimate_loss()
-            print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}, test loss {losses['test']:.4f}")
+            print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+
+        # if iter % eval_interval == 0 or iter == max_iters - 1:
+        #     losses = estimate_loss()
+        #     print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}, test loss {losses['test']:.4f}")
 
         # sample a batch of data
         xb, yb = get_batch('train')
@@ -224,12 +224,11 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
         loss.backward()
         optimizer.step()
 
-        # Ensure function returns tuple containing  test_data tensor and the generated text when training loop finishes, along with itos mapping
+        # return tuple containing test_data tensor, generated text, and itos mapping inside the training loop
         if iter == max_iters - 1:
             return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
 
-    # return test_data, decode(m.generate(context, max_new_tokens)[0].tolist())
-    # Ensure function returns tuple containing  test_data tensor and the generated text when training loop finishes, along with itos mapping
+    # Ensure function returns tuple containing test_data tensor, generated text, and itos mapping when training loop finishes
     return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
 
 
