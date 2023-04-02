@@ -68,4 +68,13 @@ def clean_data(text_data, column_names=None):
     df_clean['rr'] = pd.to_numeric(df_clean['rr'])
     df_clean['lr'] = pd.to_numeric(df_clean['lr'])
 
+    print("Original DataFrame: ")
+    print(df)
+
+    print("Cleaned DataFrame: ")
+    print(df_clean)
+
+    print("Invalid Rows: ")
+    print(invalid_rows)
+
     return df, df_clean, invalid_rows

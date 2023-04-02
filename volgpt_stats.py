@@ -44,6 +44,21 @@ def volgpt_stats(generated_text, test_data, itos):
     log_t_stat, log_p_value = stats.ttest_rel(true_log_returns, predicted_log_returns)
 
     # Print the results
+    print("Clean generated data: ")
+    print(generated_clean), print()
+
+    print("Clean test data: ")
+    print(test_data_clean), print()
+
+    print("Merged data: ")
+    print(merged_data), print()
+
+    print("Generated data date range: ", generated_clean['DateTimeIndex'].min(), "to", generated_clean['DateTimeIndex'].max())
+    print("Test data date range: ", test_data_clean['DateTimeIndex'].min(), "to", test_data_clean['DateTimeIndex'].max()), print()
+
+    print(f"Raw returns MSE: {rr_mse:.4f}, MAE: {rr_mae:.4f}")
+    print(f"Log returns MSE: {lr_mse:.4f}, MAE: {lr_mae:.4f}"), print()
+
     print(f"Raw returns paired t-test results: T-statistic = {raw_t_stat:.2f}, p-value = {raw_p_value:.6f}")
     print(f"Log returns paired t-test results: T-statistic = {log_t_stat:.2f}, p-value = {log_p_value:.6f}")
 

@@ -96,6 +96,10 @@ def high_frequency_data(dp=2):
     AAPL_stats = stats.describe(AAPL_rr_stat) # Descriptive statistics for AAPL
     JPM_stats = stats.describe(JPM_rr_stat) # Descriptive statistics for JPM
 
+    # save df_data_AAPL and df_data_JPM as a text file with a comma delimiter
+    df_data_AAPL.to_csv('df_data_AAPL.txt', sep=',', index=True)
+    df_data_JPM.to_csv('df_data_JPM.txt', sep=',', index=True)
+
     return (df_data_AAPL, df_data_JPM, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr, AAPL_stats, JPM_stats)
 
 
