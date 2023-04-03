@@ -18,26 +18,15 @@ def volgpt_stats(generated_text, test_data, itos):
     _, generated_clean, _ = clean_data(generated_text, column_names)
     _, test_data_clean, _ = clean_data(test_data_text, column_names)
     
-
-    print("Generated data date range: ", generated_clean['DateTimeIndex'].min(), "to", generated_clean['DateTimeIndex'].max())
-    print("Test data date range: ", test_data_clean['DateTimeIndex'].min(), "to", test_data_clean['DateTimeIndex'].max())
-    print("Generated data sample: ")
-    print(generated_clean.head())
-    print("Test data sample: ")
-    print(test_data_clean.head())
-
-
     # ensure the timing of the predictions and the test data are aligned by merging on DateTimeIndex
     merged_data = generated_clean.merge(test_data_clean, on='DateTimeIndex', suffixes=('_generated', '_test'))
 
     # remove rows with spurious values for rr_generated and/or lr_generated 
-    # merged_data = merged_data[(merged_data['rr_generated'] <= 2) & (merged_data['rr_generated'] >= -2) & 
-    #                             (merged_data['lr_generated'] <= 1) & (merged_data['lr_generated'] >= -1)]
+    merged_data = merged_data[(merged_data['rr_generated'] <= 2) & (merged_data['rr_generated'] >= -2) & 
+                                (merged_data['lr_generated'] <= 1) & (merged_data['lr_generated'] >= -1)]
 
-    # USE THIS ONE
-    merged_data = merged_data[((merged_data['rr_generated'] <= 2) & (merged_data['rr_generated'] >= -2)) |
-                          ((merged_data['lr_generated'] <= 2) & (merged_data['lr_generated'] >= -2))]
-
+     # merged_data = merged_data[((merged_data['rr_generated'] <= 2) & (merged_data['rr_generated'] >= -2)) |
+    #                       ((merged_data['lr_generated'] <= 2) & (merged_data['lr_generated'] >= -2))]
 
     # calculate MSE and MAE for the raw returns (rr) and log returns (lr)
     rr_mse = mean_squared_error(merged_data['rr_generated'], merged_data['rr_test'])
