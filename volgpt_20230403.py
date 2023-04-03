@@ -1,11 +1,11 @@
+import numpy as np
 import torch
 import torch.nn as nn
 from torch.nn import functional as F
 
-# Define the function train_and_generate
 def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, device='cuda', max_new_tokens=5000):
 
-    # hyperparameters
+    # set hyperparameters
     batch_size = 16 # how many independent sequences will we process in parallel?
     block_size = 32 # what is the maximum context length for predictions?
     max_iters = 5000
@@ -36,9 +36,9 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     decode = lambda l: ''.join([itos[i] for i in l]) # decoder: take a list of integers, output a string
 
     data = torch.tensor(encode(text), dtype=torch.long)
-    n_train = int(0.8 * len(data))  # first 80% will be train
-    n_val = int(0.1 * len(data))  # next 10% will be validation
-    train_data = data[:n_train] # final 10% will be test
+    n_train = int(0.8 * len(data))  # first % will be train
+    n_val = int(0.1 * len(data))  # next % will be validation
+    train_data = data[:n_train]  # final % will be test
     val_data = data[n_train:n_train + n_val]
     test_data = data[n_train + n_val:]
 
@@ -207,13 +207,13 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
     for iter in range(max_iters):
 
         # periodically evaluate loss on train, val, and test sets
-        # if iter % eval_interval == 0 or iter == max_iters - 1:
-        #     losses = estimate_loss()
-        #     print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
-
         if iter % eval_interval == 0 or iter == max_iters - 1:
             losses = estimate_loss()
-            print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}, test loss {losses['test']:.4f}")
+            print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}")
+
+        # if iter % eval_interval == 0 or iter == max_iters - 1:
+        #     losses = estimate_loss()
+        #     print(f"step {iter}: train loss {losses['train']:.4f}, val loss {losses['val']:.4f}, test loss {losses['test']:.4f}")
 
         # sample a batch of data
         xb, yb = get_batch('train')
@@ -224,10 +224,13 @@ def train_and_generate(text_file_path, max_iters=5000, learning_rate=1e-3, devic
         loss.backward()
         optimizer.step()
 
-        # Ensure function returns tuple containing  test_data tensor and the generated text when training loop finishes, along with itos mapping
+        # return tuple containing test_data tensor, generated text, and itos mapping inside the training loop
         if iter == max_iters - 1:
             return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
 
-    # return test_data, decode(m.generate(context, max_new_tokens)[0].tolist())
-    # Ensure function returns tuple containing  test_data tensor and the generated text when training loop finishes, along with itos mapping
+    # Ensure function returns tuple containing test_data tensor, generated text, and itos mapping when training loop finishes
     return test_data, decode(m.generate(context, max_new_tokens)[0].tolist()), itos
+
+
+
+

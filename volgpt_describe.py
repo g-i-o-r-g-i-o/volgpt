@@ -36,7 +36,22 @@ def volgpt_import(dp=8):
       else:
             print('missing JPM rows: ', missing_rows_JPM.shape) # print number of rows with missing values
 
+
+      # save df_data_AAPL and df_data_JPM as a text file with a comma delimiter
+      df_data_AAPL.to_csv('df_data_AAPL.txt', sep=',', index=True)
+      df_data_JPM.to_csv('df_data_JPM.txt', sep=',', index=True)
+
+      # Check that the text file was saved correctly
+      df_exported_AAPL = pd.read_csv('df_data_AAPL.txt', sep=',') # read the text file into a dataframe
+      df_exported_JPM = pd.read_csv('df_data_JPM.txt', sep=',') # read the text file into a dataframe
+
+      print('shape of df_data_AAPL: ', df_data_AAPL.shape)
+      print('shape of df_exported_AAPL: ', df_exported_AAPL.shape)
+      print('shape of df_data_JPM: ', df_data_JPM.shape)
+      print('shape of df_exported_JPM: ', df_exported_JPM.shape)
+
       return df_data_AAPL, df_data_JPM, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr, AAPL_stats, JPM_stats, device
+
 
 def volgpt_describe(AAPL_stats, JPM_stats, df_data_AAPL, df_data_JPM, AAPL_lr, JPM_lr):
 

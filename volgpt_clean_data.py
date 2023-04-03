@@ -14,28 +14,42 @@ def clean_data(text_data, column_names=None):
     df = pd.read_csv(data_io, header=None, names=column_names)
 
     # check date format
-    # def check_date_format(date_str):
-    #     if pd.isna(date_str):
-    #         return False
-    #     try:
-    #         datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-    #         return True
-    #     except ValueError:
-    #         return False
-
-    # check date format and check date range, removing rows with invalid date format or date range
     def check_date_format(date_str):
         if pd.isna(date_str):
             return False
         try:
-            dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
-            min_date = datetime(2000, 1, 1)  # for tractability, I set ranges outside of the actual data range
-            max_date = datetime(2050, 12, 31)
-            if dt < min_date or dt > max_date:
-                return False
+            datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
             return True
         except ValueError:
             return False
+
+    # check date format and check date range, removing rows with invalid date format or date range
+    # def check_date_format(date_str):
+    #     if pd.isna(date_str):
+    #         return False
+    #     try:
+    #         dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    #         min_date = datetime(2000, 1, 1)  # for tractability, I set ranges outside of the actual data range
+    #         max_date = datetime(2050, 12, 31)
+    #         if dt < min_date or dt > max_date:
+    #             return False
+    #         return True
+    #     except ValueError:
+    #         return False
+
+    # check date format and check valid date range for pandas times stamps, removing rows with invalid date format or date range
+    # def check_date_format(date_str):
+    #     if pd.isna(date_str):
+    #         return False
+    #     try:
+    #         dt = datetime.strptime(date_str, '%Y-%m-%d %H:%M:%S')
+    #         min_date = pd.Timestamp.min.to_pydatetime()
+    #         max_date = pd.Timestamp.max.to_pydatetime()
+    #         if dt < min_date or dt > max_date:
+    #             return False
+    #         return True
+    #     except ValueError:
+    #         return False
 
     def check_numeric(value):
         if pd.isna(value):
@@ -68,13 +82,16 @@ def clean_data(text_data, column_names=None):
     df_clean['rr'] = pd.to_numeric(df_clean['rr'])
     df_clean['lr'] = pd.to_numeric(df_clean['lr'])
 
-    print("Original DataFrame: ")
-    print(df)
+    # print("Outputs from clean_data function: ")
+    # print("-----------------------------"), print()
 
-    print("Cleaned DataFrame: ")
-    print(df_clean)
+    # print("Original DataFrame: ")
+    # print(df)
 
-    print("Invalid Rows: ")
-    print(invalid_rows)
+    # print("Cleaned DataFrame: ")
+    # print(df_clean)
+
+    # print("Invalid Rows: ")
+    # print(invalid_rows)
 
     return df, df_clean, invalid_rows
