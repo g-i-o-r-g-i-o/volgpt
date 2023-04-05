@@ -54,7 +54,7 @@ def volgpt_import(dp=8):
       return df_data_AAPL, df_data_JPM, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr, AAPL_stats, JPM_stats, device
 
 
-def volgpt_describe(AAPL_stats, JPM_stats, df_data_AAPL, df_data_JPM, AAPL_lr, JPM_lr):
+def volgpt_describe(AAPL_stats, JPM_stats, df_data_AAPL, df_data_JPM, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr):
 
       # Descriptive statistics
       print() # Print blank line
@@ -117,14 +117,14 @@ def volgpt_describe(AAPL_stats, JPM_stats, df_data_AAPL, df_data_JPM, AAPL_lr, J
       z = z.replace('UNK', np.nan)  # Replace 'UNK' values with NaN
       z = z.astype(float).dropna()  # Convert the series to float type and drop NaN values
       z = z[z != 0].copy()  # Filter out zero values
-      z.plot(ax=ax3, title="AAPL log returns (source data: NYSE TAQ)", xlabel="Observations", ylabel="AAPL log return", color='darkslategrey', linewidth=0.3, alpha=0.75)
+      z.plot(ax=ax3, title="AAPL log returns (source data: NYSE TAQ)", xlabel="Observations", ylabel="AAPL log returns", color='darkslategrey', linewidth=0.1, alpha=0.75)
 
       # Plot JPM log returns
       z1 = JPM_lr
       z1 = z1.replace('UNK', np.nan)  # Replace 'UNK' values with NaN
       z1 = z1.astype(float).dropna()  # Convert the series to float type and drop NaN values
       z1 = z1[z1 != 0].copy()  # Filter out zero values
-      z1.plot(ax=ax4, title="JPM log returns (source data: NYSE TAQ)", xlabel="Observations", ylabel="JPM log return", color='saddlebrown', linewidth=0.3, alpha=0.75)
+      z1.plot(ax=ax4, title="JPM log returns (source data: NYSE TAQ)", xlabel="Observations", ylabel="JPM log returns", color='saddlebrown', linewidth=0.1, alpha=0.75)
 
       plt.tight_layout()
       plt.show()

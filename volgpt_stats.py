@@ -62,10 +62,10 @@ def volgpt_stats(generated_text, test_data, itos):
     print("Generated data date range: ", generated_clean['DateTimeIndex'].min(), "to", generated_clean['DateTimeIndex'].max())
     print("Test data date range: ", test_data_clean['DateTimeIndex'].min(), "to", test_data_clean['DateTimeIndex'].max()), print()
 
-    print(f"Raw returns MSE: {rr_mse:.4f}, MAE: {rr_mae:.4f}")
-    print(f"Log returns MSE: {lr_mse:.4f}, MAE: {lr_mae:.4f}"), print()
+    print(f"Raw returns MSE: {rr_mse:.8f}, MAE: {rr_mae:.8f}")
+    print(f"Log returns MSE: {lr_mse:.8f}, MAE: {lr_mae:.8f}"), print()
 
-    print(f"Raw returns paired t-test results: T-statistic = {raw_t_stat:.2f}, p-value = {raw_p_value:.6f}")
-    print(f"Log returns paired t-test results: T-statistic = {log_t_stat:.2f}, p-value = {log_p_value:.6f}")
+    print(f"Raw returns paired t-test results: T-statistic = {raw_t_stat:.8f}, p-value = {raw_p_value:.8f}")
+    print(f"Log returns paired t-test results: T-statistic = {log_t_stat:.8f}, p-value = {log_p_value:.8f}")
 
     return generated_clean, test_data_clean, merged_data, rr_mae, rr_mse, lr_mae, lr_mse, raw_t_stat, raw_p_value, log_t_stat, log_p_value

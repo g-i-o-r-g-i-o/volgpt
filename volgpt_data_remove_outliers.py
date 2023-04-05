@@ -42,34 +42,39 @@ def high_frequency_data(dp=2):
     df_data_AAPL = df_data.loc[df_data['Ticker'] == 'AAPL']
     df_data_JPM = df_data.loc[df_data['Ticker'] == 'JPM']
 
-    # Compute raw returns
+    # Compute raw returns and merge with df_data_AAPL and df_data_JPM
     AAPL_rr = df_data_AAPL['WeightedMidPrice'] - df_data_AAPL['WeightedMidPrice'].shift(1)
-    JPM_rr = df_data_JPM['WeightedMidPrice'] - df_data_JPM['WeightedMidPrice'].shift(1)
-
-    # Compute log returns
-    AAPL_lr = np.log(df_data_AAPL['WeightedMidPrice'].astype(float))
-    AAPL_lr = AAPL_lr - AAPL_lr.shift(1)
-    JPM_lr = np.log(df_data_JPM['WeightedMidPrice'].astype(float))
-    JPM_lr = JPM_lr - JPM_lr.shift(1)
-
-    # set parameters for outlier removal
-    Q1l = AAPL_lr.quantile(0.001)   # Start with these quantile values, experiment with lower values
-    Q3l = AAPL_lr.quantile(0.999)   # Start with these quantile values, experiment with lower values if necessary
-    IQl = Q3l - Q1l
+    AAPL_rr = AAPL_rr[AAPL_rr.notna()].copy()
+    AAPL_rr = AAPL_rr[AAPL_rr != 0].copy()
     Q1r = AAPL_rr.quantile(0.001)   # Start with these quantile values, experiment with lower values
     Q3r = AAPL_rr.quantile(0.999)   # Start with these quantile values, experiment with lower values if necessary
     IQr = Q3r - Q1r
-    
-    # Remove outliers
-    AAPL_lr = AAPL_lr[~((AAPL_lr < (Q1l - 1.5 * IQl)) | (AAPL_lr > (Q3l + 1.5 * IQl)))]
-    AAPL_rr = AAPL_rr[~((AAPL_rr < (Q1r - 1.5 * IQr)) | (AAPL_rr > (Q3r + 1.5 * IQr)))]
-    JPM_lr = JPM_lr[~((JPM_lr < (Q1l - 1.5 * IQl)) | (JPM_lr > (Q3l + 1.5 * IQl)))]
-    JPM_rr = JPM_rr[~((JPM_rr < (Q1r - 1.5 * IQr)) | (JPM_rr > (Q3r + 1.5 * IQr)))]
+    AAPL_rr = AAPL_rr[~((AAPL_rr < (Q1r - 1.5 * IQr)) | (AAPL_rr > (Q3r + 1.5 * IQr)))] # Remove outliers
 
-    # merge
     df_data_AAPL = df_data_AAPL.merge(AAPL_rr.to_frame(name='AAPL_rr'), left_index=True, right_index=True, how='left') # merge
+    JPM_rr = df_data_JPM['WeightedMidPrice'] - df_data_JPM['WeightedMidPrice'].shift(1)
+    JPM_rr = JPM_rr[JPM_rr.notna()].copy()
+    JPM_rr = JPM_rr[JPM_rr != 0].copy()
+    JPM_rr = JPM_rr[~((JPM_rr < (Q1r - 1.5 * IQr)) | (JPM_rr > (Q3r + 1.5 * IQr)))] # Remove outliers
     df_data_JPM = df_data_JPM.merge(JPM_rr.to_frame(name='JPM_rr'), left_index=True, right_index=True, how='left') # merge
+
+    # Compute log returns and merge with df_data_AAPL and df_data_JPM
+    AAPL_lr = np.log(df_data_AAPL['WeightedMidPrice'].astype(float))
+    AAPL_lr = AAPL_lr - AAPL_lr.shift(1)
+    AAPL_lr = AAPL_lr[AAPL_lr.notna()].copy()
+    AAPL_lr = AAPL_lr[AAPL_lr != 0].copy()
+    Q1l = AAPL_lr.quantile(0.001)   # Start with these quantile values, experiment with lower values
+    Q3l = AAPL_lr.quantile(0.999)   # Start with these quantile values, experiment with lower values if necessary
+    IQl = Q3l - Q1l
+    AAPL_lr = AAPL_lr[~((AAPL_lr < (Q1l - 1.5 * IQl)) | (AAPL_lr > (Q3l + 1.5 * IQl)))] # Remove outliers
     df_data_AAPL = pd.concat([df_data_AAPL, AAPL_lr.rename('AAPL_lr')], axis=1) # merge using different method as AAPL_lr is a series
+
+    JPM_lr = np.log(df_data_JPM['WeightedMidPrice'].astype(float))
+    JPM_lr = JPM_lr - JPM_lr.shift(1)
+    JPM_lr = JPM_lr[JPM_lr.notna()].copy()
+    JPM_lr = JPM_lr[JPM_lr != 0].copy()
+    JPM_lr = JPM_lr[~((JPM_lr < (Q1l - 1.5 * IQl)) | (JPM_lr > (Q3l + 1.5 * IQl)))] # Remove outliers
+
     df_data_JPM = pd.concat([df_data_JPM, JPM_lr.rename('JPM_lr')], axis=1) # merge using different method as JPM_lr is a series
 
     # format numbers with exactly dp decimal places, to impose structure upon data, which helps the model quite a bit
@@ -96,11 +101,4 @@ def high_frequency_data(dp=2):
     AAPL_stats = stats.describe(AAPL_rr_stat) # Descriptive statistics for AAPL
     JPM_stats = stats.describe(JPM_rr_stat) # Descriptive statistics for JPM
 
-    # save df_data_AAPL and df_data_JPM as a text file with a comma delimiter
-    df_data_AAPL.to_csv('df_data_AAPL.txt', sep=',', index=True)
-    df_data_JPM.to_csv('df_data_JPM.txt', sep=',', index=True)
-
     return (df_data_AAPL, df_data_JPM, AAPL_rr, JPM_rr, AAPL_lr, JPM_lr, AAPL_stats, JPM_stats)
-
-
-

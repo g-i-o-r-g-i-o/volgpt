@@ -23,7 +23,7 @@ def clean_data(text_data, column_names=None):
         except ValueError:
             return False
 
-    # check date format and check date range, removing rows with invalid date format or date range
+    # Alternative date format checks
     # def check_date_format(date_str):
     #     if pd.isna(date_str):
     #         return False
@@ -37,7 +37,7 @@ def clean_data(text_data, column_names=None):
     #     except ValueError:
     #         return False
 
-    # check date format and check valid date range for pandas times stamps, removing rows with invalid date format or date range
+    # Another alternative date format check
     # def check_date_format(date_str):
     #     if pd.isna(date_str):
     #         return False
